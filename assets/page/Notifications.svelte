@@ -15,7 +15,7 @@ const conversation = user.notifications;
 $: classNames = ['main', messages.length && 'has-results'].filter(i => i);
 $: messages = $conversation.messages;
 
-onDestroy(() => { user.markNotificationsRead(); conversation.markAsRead() });
+  onDestroy(() => user.markNotificationsRead(); });
 onMount(() => conversation.load());
 </script>
 

@@ -121,6 +121,7 @@ export default class User extends Reactive {
 
   markNotificationsRead() {
     this.conversations().forEach(conv => conv.update({notifications: 0}));
+    user.activeConversation.markAsRead();
   }
 
   removeConversation(params) {
