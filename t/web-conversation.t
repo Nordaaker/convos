@@ -29,9 +29,35 @@ $t->get_ok('/api/conversations')->status_is(200)->json_is(
       name            => '#Convos',
       topic           => '',
       unread          => 42,
+      notifications   => 0,
     },
   ]
 );
+
+$connection->conversation({name => '#Notified', frozen => ''})->notifications(2);
+$t->get_ok('/api/conversations')->status_is(200)->json_is(
+  '/conversations' => [
+    {
+      connection_id   => 'irc-localhost',
+      conversation_id => '#convos',
+      frozen          => '',
+      name            => '#Convos',
+      topic           => '',
+      unread          => 42,
+      notifications   => 0,
+    },
+    {
+      connection_id   => 'irc-localhost',
+      conversation_id => '#notified',
+      frozen          => '',
+      name            => '#Notified',
+      topic           => '',
+      unread          => 0,
+      notifications   => 2,
+    },
+  ]
+);
+
 
 $user->connection({url => 'irc://example'})->conversation({name => '#superheroes', frozen => ''})
   ->unread(34);
@@ -70,6 +96,16 @@ $t->get_ok('/api/user?connections=true&conversations=true')->status_is(200)->jso
       name            => '#Convos',
       topic           => '',
       unread          => 42,
+      notifications   => 0,
+    },
+    {
+      connection_id   => 'irc-localhost',
+      conversation_id => '#notified',
+      frozen          => '',
+      name            => '#Notified',
+      topic           => '',
+      unread          => 0,
+      notifications   => 2,
     },
     {
       connection_id   => 'irc-example',
@@ -78,6 +114,7 @@ $t->get_ok('/api/user?connections=true&conversations=true')->status_is(200)->jso
       name            => '#superheroes',
       topic           => '',
       unread          => 34,
+      notifications   => 0,
     }
   ],
   'user conversations'

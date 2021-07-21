@@ -104,7 +104,8 @@ export default class User extends Reactive {
     (data.connections || []).forEach(conn => this.ensureConversation({...conn, status: 'pending'}));
     (data.conversations || []).forEach(conversation => this.ensureConversation({...conversation, status: 'pending'}));
 
-    this.notifications.update({unread: data.unread || 0});
+    this.updateNotificationCount();
+
     (data.roles || []).forEach(role => this.roles.add(role));
 
     return this.update({
@@ -116,6 +117,11 @@ export default class User extends Reactive {
       status: res.errors ? 'error' : 'success',
       videoService: data.video_service || '',
     });
+  }
+
+  markNotificationsRead() {
+    this.conversations().forEach(conv => conv.update({notifications: 0}));
+    user.activeConversation.markAsRead();
   }
 
   removeConversation(params) {
@@ -144,6 +150,16 @@ export default class User extends Reactive {
     return super.update(params);
   }
 
+  updateNotificationCount() {
+    this.notifications.update({unread: this._calculateNotifications()});
+  }
+
+  _calculateNotifications() {
+    return this.connections.toArray().reduce(
+      (outersum, conn) => outersum + conn.conversations.toArray().reduce(
+        (sum, conv) => sum + conv.notifications, 0), 0);
+  }
+
   _calculateUnread() {
     const activeConversation = this.activeConversation;
     return this.notifications.unread
@@ -156,15 +172,21 @@ export default class User extends Reactive {
     msg.silent = this.ignoreStatuses;
     this.emit(msg.dispatchTo, msg);
 
-    if (msg.highlight) this.notifications.addMessages(msg);
-
     const conn = this.findConversation({connection_id: msg.connection_id});
     if (!conn) return;
     if (conn[msg.dispatchTo]) conn[msg.dispatchTo](msg);
     if (!msg.bubbles) return;
 
     const conversation = conn.findConversation(msg);
-    if (conversation && conversation[msg.dispatchTo]) conversation[msg.dispatchTo](msg);
+    if (conversation && conversation[msg.dispatchTo]) {
+      conversation[msg.dispatchTo](msg);
+    }
+
+    if (msg.highlight) {
+      this.notifications.addMessages(msg);
+      conversation.update({notifications: conversation.notifications + 1});
+      this.updateNotificationCount();
+    }
   }
 
   _getEventNameFromMessage(msg) {

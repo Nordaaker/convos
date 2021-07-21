@@ -14,9 +14,10 @@ sub messages {
 
 sub read {
   my $self = shift->openapi->valid_input or return;
-  my $user = $self->backend->user        or return $self->reply->errors([], 401);
+  my $user = $self->backend->user or return $self->reply->errors([], 401);
 
-  return $user->unread(0)->save_p->then(sub { $self->render(openapi => {}) });
+  $user->connections->map(sub { shift->conversations->map(notifications => 0) });
+  $self->render(openapi => {});
 }
 
 1;

@@ -9,11 +9,11 @@ sub mark_as_read {
   my $conversation = $self->backend->conversation({});
 
   unless ($conversation) {
-    return $self->reply->errors([],                        401) unless $self->backend->user;
+    return $self->reply->errors([], 401) unless $self->backend->user;
     return $self->reply->errors('Conversation not found.', 404);
   }
 
-  $conversation->unread(0);
+  $conversation->notifications(0)->unread(0);
   $self->stash('connection')->save_p->then(sub {
     $self->render(openapi => {});
   });
@@ -21,7 +21,7 @@ sub mark_as_read {
 
 sub list {
   my $self = shift->openapi->valid_input or return;
-  my $user = $self->backend->user        or return $self->reply->errors([], 401);
+  my $user = $self->backend->user or return $self->reply->errors([], 401);
   my @conversations;
 
   for my $connection (sort { $a->name cmp $b->name } @{$user->connections}) {

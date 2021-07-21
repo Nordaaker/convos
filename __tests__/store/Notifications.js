@@ -18,10 +18,7 @@ test('addMessages', () => {
   let c = new Notifications({});
 
   c.addMessages([{message: ''}]);
-  expect(c.unread).toBe(0);
-
   c.addMessages({message: 'cool beans'});
-  expect(c.unread).toBe(1);
   expect(c.messages.length).toBe(2);
 });
 

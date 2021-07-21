@@ -8,13 +8,13 @@ export default class Notifications extends Conversation {
       connection_id: '',
       conversation_id: 'notifications',
       name: 'Notifications',
+      unread: 0,
     });
   }
 
   addMessages(messages, method) {
     if (!Array.isArray(messages)) {
       messages = [messages];
-      this.update({unread: this.unread + 1});
     }
 
     this.messages.push(messages);

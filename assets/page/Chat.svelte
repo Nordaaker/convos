@@ -39,6 +39,7 @@ let focusChatInput, fillIn, uploader;
 
 $: setConversationFromRoute(connection_id, conversation_id);
 $: setConversationFromUser($user);
+$: updateNotificationCount($user);
 $: messages.update({expandUrlToMedia: $user.expandUrlToMedia});
 $: notConnected = $conversation.frozen ? true : false;
 $: title = $conversation.title;
@@ -97,6 +98,11 @@ function showPopover(e) {
       if (!$popoverTarget) target.click();
     }
   }, 250);
+}
+
+function updateNotificationCount(user) {
+  user.activeConversation.update({notifications: 0});
+  user.updateNotificationCount();
 }
 </script>
 

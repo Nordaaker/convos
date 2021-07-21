@@ -126,6 +126,7 @@ cmp_deeply(
         name            => '#convos',
         topic           => 'Too cool!',
         unread          => 0,
+        notifications   => 0,
       }
     ]
   ),

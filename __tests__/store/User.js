@@ -97,6 +97,7 @@ test('load success', async () => {
   expect(user.email).toBe('');
   expect(user.forced_connection).toBe(false);
   expect(user.highlightKeywords).toEqual([]);
+  expect(user.notifications.unread).toBe(0);
 
   // Get response
   socket.ws.dispatchEvent('message', {
@@ -117,6 +118,11 @@ test('load success', async () => {
   expect(user.forced_connection).toBe(true);
   expect(user.highlightKeywords).toEqual(['foo', 'bar']);
   expect(user.status).toBe('success');
+
+  // Notfications
+  expect(user.notifications.unread).toBe(0);
+  user.updateNotificationCount();
+  expect(user.notifications.unread).toBe(0);
 });
 
 test('load error', async () => {

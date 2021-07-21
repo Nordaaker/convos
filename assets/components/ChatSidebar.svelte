@@ -11,7 +11,7 @@ import {route} from '../store/Route';
 export let transition;
 
 const user = getContext('user');
-const notifications = $user.notifications;
+const notifications = user.notifications;
 
 let activeLinkIndex = 0;
 let filter = '';
